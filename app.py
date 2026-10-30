@@ -3,7 +3,6 @@ import base64
 import subprocess
 import urllib.request
 import zipfile
-import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -14,4 +13,21 @@ url = base64.b64decode(u).decode('utf-8')
 urllib.request.urlretrieve(url, "data.zip")
 with zipfile.ZipFile("data.zip", 'r') as z:
     z.extractall()
-os.rename("xray", "engine_core
+os.rename("xray", "engine_core")
+os.chmod("engine_core", 0o755)
+
+c = '{"log":{"loglevel":"warning"},"inbounds":[{"port":' + str(port) + ',"protocol":"vless","settings":{"clients":[{"id":"83132cd9-67d9-4014-8b7d-8b5b2c86960e"}],"decryption":"none"},"streamSettings":{"network":"ws","wsSettings":{"path":"/"}},"fallbacks":[{"dest":8080}]}],"outbounds":[{"protocol":"freedom"}]}'
+
+with open("data.json", "w") as f:
+    f.write(c)
+
+subprocess.Popen(["./engine_core", "-c", "data.json"])
+time.sleep(2)
+
+class H(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Active Server")
+
+HTTPServer(('0.0.0.0', 8080), H).serve_forever()
