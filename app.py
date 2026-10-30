@@ -18,7 +18,7 @@ with zipfile.ZipFile("data.zip", 'r') as z:
 os.rename("xray", "sys_worker")
 os.chmod("sys_worker", 0o755)
 
-c = '{"log":{"loglevel":"warning"},"inbounds":[{"port":' + str(port) + ',"protocol":"vless","settings":{"clients":[{"id":"83132cd9-67d9-4014-8b7d-8b5b2c86960e"}],"decryption":"none"},"streamSettings":{"network":"httpupgrade","httpupgradeSettings":{"path":"/tunnel"}},"fallbacks":[{"dest":' + str(dummy_port) + '}]}],"outbounds":[{"protocol":"freedom"}]}'
+c = '{"log":{"loglevel":"warning"},"inbounds":[{"port":' + str(port) + ',"protocol":"vless","settings":{"clients":[{"id":"83132cd9-67d9-4014-8b7d-8b5b2c86960e"}],"decryption":"none"},"streamSettings":{"network":"ws","wsSettings":{"path":"/ws"}},"fallbacks":[{"dest":' + str(dummy_port) + '}]}],"outbounds":[{"protocol":"freedom"}]}'
 with open("data.json", "w") as f:
     f.write(c)
 
@@ -30,8 +30,6 @@ class DummyServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         self.wfile.write(b"Active System")
-    def do_HEAD(self):
-        self.do_GET()
 
 def run_dummy():
     try:
